@@ -6,57 +6,58 @@
     <style>
         body { 
             margin: 0; font-family: 'Inter', sans-serif; color: #fff;
+            height: 100vh;
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                         url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000') no-repeat center center fixed;
             background-size: cover;
-            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
-        header { display: flex; justify-content: space-between; padding: 20px 50px; align-items: center; background: rgba(0,0,0,0.3); }
-        .container { background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; width: 90%; max-width: 700px; margin: 50px auto; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .cta { display: block; background: #0070f3; color: white; padding: 20px; text-decoration: none; border-radius: 10px; font-weight: bold; }
+        .container { background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; width: 90%; max-width: 700px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 30px 0; }
+        .box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); font-weight: bold; }
+        #score-display { font-size: 1.5rem; color: #00dfd8; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <header>
-        <div style="font-weight: 800; font-size: 1.5rem;">SaverSeats</div>
-        <nav>Home &nbsp; Matches &nbsp; Tickets &nbsp; About</nav>
-    </header>
 
     <div class="container">
         <h1>MATCH 102: ENGLAND vs ARGENTINA</h1>
         <p>World Cup 2026 Semi-Final | Mercedes-Benz Stadium, Atlanta</p>
         
         <div class="grid">
-            <div class="box">SCORE<br>0 - 0</div>
-            <div class="box">MINUTES<br>0</div>
-            <div class="box">STATUS<br>Live</div>
-            <div class="box">TICKETS<br>Active</div>
-            <div class="box">TRAFFIC<br><span id="visit-count">...</span></div>
+            <div class="box">LIVE VISITORS<br><span id="visit-count">...</span></div>
+            <div class="box">LIVE CLICKS<br><span id="click-count">...</span></div>
         </div>
-        
-        <a href="https://argentinawc26.saverseats.com/" class="cta">VIEW LIVE TRACKER & GET TICKETS</a>
+
+        <div id="score-display" class="box">Loading Live Data...</div>
     </div>
 
     <script>
         const NS = "saverseats_main";
-        const INDEXNOW_KEY = "53fba66fb27b4b2594dafb10a83b1000
-"; // REPLACE THIS
+        const KEY = "53fba66fb27b4b2594dafb10a83b1000";
+        const JSON_URL = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
 
-        function pingAll() {
-            // Update Live Stats
+        async function refreshAll() {
+            // 1. Update Traffic Counters
             fetch(`https://api.counterapi.dev/v1/${NS}/visits`)
-                .then(r => r.json())
-                .then(d => { document.getElementById('visit-count').innerText = d.value; });
+                .then(r => r.json()).then(d => { document.getElementById('visit-count').innerText = d.value; });
+            fetch(`https://api.counterapi.dev/v1/${NS}/clicks`)
+                .then(r => r.json()).then(d => { document.getElementById('click-count').innerText = d.value; });
             
-            // SEO Ping (IndexNow)
-            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=${INDEXNOW_KEY}`, { method: 'POST' });
+            // 2. Fetch Live Match Data
+            try {
+                const res = await fetch(JSON_URL);
+                const data = await res.json();
+                document.getElementById('score-display').innerText = data.score || "Status: Live Scheduled";
+            } catch (e) { console.log("Data fetch failed"); }
+
+            // 3. Automated SEO Ping
+            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=${KEY}`, { method: 'POST' });
         }
-        
+
         // Auto-run every 30 seconds
-        setInterval(pingAll, 30000);
-        pingAll();
+        setInterval(refreshAll, 30000);
+        refreshAll();
     </script>
 </body>
 </html>
