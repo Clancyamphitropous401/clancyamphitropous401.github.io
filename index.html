@@ -16,6 +16,13 @@
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 30px 0; }
         .box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); font-weight: bold; }
         #score-display { font-size: 1.5rem; color: #00dfd8; margin-top: 20px; }
+        .cta-button {
+            display: inline-block; margin-top: 30px; padding: 15px 40px;
+            background-color: #00dfd8; color: #000; text-decoration: none;
+            font-weight: bold; border-radius: 50px; transition: transform 0.2s, background-color 0.2s;
+            font-size: 1.2rem;
+        }
+        .cta-button:hover { transform: scale(1.05); background-color: #ffffff; }
     </style>
 </head>
 <body>
@@ -30,29 +37,32 @@
         </div>
 
         <div id="score-display" class="box">Loading Live Data...</div>
+
+        <a href="https://argentinawc26.saverseats.com" 
+           class="cta-button" 
+           target="_blank" 
+           onclick="fetch('https://api.counterapi.dev/v1/saverseats_main/clicks/up')">
+           GET TICKETS NOW
+        </a>
     </div>
 
     <script>
         const NS = "saverseats_main";
-        const KEY = "53fba66fb27b4b2594dafb10a83b1000";
         const JSON_URL = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
 
         async function refreshAll() {
-            // 1. Update Traffic Counters
-            fetch(`https://api.counterapi.dev/v1/${NS}/visits`)
+            // Update Traffic Counters
+            fetch(`https://api.counterapi.dev/v1/${NS}/visits/up`)
                 .then(r => r.json()).then(d => { document.getElementById('visit-count').innerText = d.value; });
             fetch(`https://api.counterapi.dev/v1/${NS}/clicks`)
                 .then(r => r.json()).then(d => { document.getElementById('click-count').innerText = d.value; });
             
-            // 2. Fetch Live Match Data
+            // Fetch Live Match Data
             try {
                 const res = await fetch(JSON_URL);
                 const data = await res.json();
                 document.getElementById('score-display').innerText = data.score || "Status: Live Scheduled";
             } catch (e) { console.log("Data fetch failed"); }
-
-            // 3. Automated SEO Ping
-            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=${KEY}`, { method: 'POST' });
         }
 
         // Auto-run every 30 seconds
