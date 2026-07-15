@@ -202,12 +202,58 @@
             width: 100%;
             max-width: 400px;
             cursor: pointer;
+            margin-bottom: 35px;
         }
 
         .cta-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 35px rgba(0, 223, 216, 0.5);
             filter: brightness(1.1);
+        }
+
+        /* --- STYLISH LIVE VISITOR COUNTER --- */
+        .stats-counter-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .counter-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .counter-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .counter-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        #visit-count {
+            background: linear-gradient(45deg, #00dfd8, #0070f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #click-count {
+            background: linear-gradient(45deg, #ff3b30, #ff9500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         /* --- FOOTER --- */
@@ -223,7 +269,8 @@
             header { padding: 15px 20px; flex-direction: column; gap: 15px; }
             .stats-grid { grid-template-columns: 1fr; }
             h1 { font-size: 1.8rem; }
-            .glass-card { padding: 25px 20px; }
+            .glass-card { padding: 30px 20px; }
+            .stats-counter-container { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
@@ -270,10 +317,23 @@
                 </div>
             </div>
 
-            <!-- Premium Glowing Link -->
-            <a id="ticket-action" href="#" class="cta-btn" target="_blank">
+            <!-- Premium Glowing Link (Tracked on Click) -->
+            <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">
                 View Live Match Tracker & Tickets ➔
             </a>
+
+            <!-- Integrated Live Stats Dashboard -->
+            <div class="stats-counter-container">
+                <div class="counter-item">
+                    <span class="counter-label">Page Views</span>
+                    <span class="counter-value" id="visit-count">...</span>
+                </div>
+                <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1);"></div>
+                <div class="counter-item">
+                    <span class="counter-label">Link Clicks</span>
+                    <span class="counter-value" id="click-count">...</span>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -286,6 +346,7 @@
         // Your exact raw Gist URL
         const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
 
+        // 1. DYNAMIC JSON DATA PARSING
         fetch(gistUrl)
             .then(response => response.json())
             .then(data => {
@@ -294,7 +355,6 @@
                 let venueName = "Mercedes-Benz Stadium, Atlanta";
                 let matchTime = "- : -";
 
-                // Safe extraction helper function to recursively search for keys
                 function findValueByKey(obj, keyToFind) {
                     if (!obj || typeof obj !== 'object') return null;
                     if (obj[keyToFind]) return obj[keyToFind];
@@ -308,34 +368,26 @@
                     return null;
                 }
 
-                // 1. Dig out the Link: Look for "url", then fallback to "@id" anywhere in the JSON
                 let foundUrl = findValueByKey(data, 'url');
                 let foundId = findValueByKey(data, '@id');
                 
                 if (foundUrl && foundUrl !== "#") {
                     targetLink = foundUrl;
                 } else if (foundId && foundId.startsWith('http')) {
-                    targetLink = foundId.split('#')[0]; // Clean off any anchor tags like #event
+                    targetLink = foundId.split('#')[0];
                 }
 
-                // 2. Dig out the Event Name
                 let foundName = findValueByKey(data, 'name');
-                if (foundName) {
-                    matchName = foundName;
-                }
+                if (foundName) matchName = foundName;
 
-                // 3. Dig out the Location / Venue
                 let locationObj = findValueByKey(data, 'location');
                 if (locationObj && locationObj.name) {
                     venueName = locationObj.name;
                 } else {
                     let foundVenue = findValueByKey(data, 'addressLocality');
-                    if (foundVenue) {
-                        venueName = `Mercedes-Benz Stadium, ${foundVenue}`;
-                    }
+                    if (foundVenue) venueName = `Mercedes-Benz Stadium, ${foundVenue}`;
                 }
 
-                // 4. Dig out and format the Start Date
                 let foundDate = findValueByKey(data, 'startDate');
                 if (foundDate) {
                     try {
@@ -345,23 +397,75 @@
                     }
                 }
 
-                // Update page elements dynamically
+                // Update UI Elements
                 document.getElementById('match-title').innerText = matchName;
                 document.getElementById('match-venue').innerText = venueName;
                 document.getElementById('time-val').innerText = matchTime;
                 
-                // Assign the final verified URL to the button
                 const btn = document.getElementById('ticket-action');
                 btn.href = targetLink;
-                
-                console.log("Successfully loaded target: ", targetLink);
             })
             .catch(err => {
-                console.error("Gist Load Failed. Falling back to default settings: ", err);
+                console.error("Gist Load Failed. Using default backup: ", err);
                 document.getElementById('match-title').innerText = "England vs Argentina (Semifinal) – FIFA World Cup 2026";
                 document.getElementById('match-venue').innerText = "Mercedes-Benz Stadium, Atlanta";
                 document.getElementById('ticket-action').href = "https://argentinawc26.saverseats.com/";
             });
+
+        // 2. LIVE TRAFFIC & CLICK COUNTER SCRIPT (Using a unique namespace for saverseats)
+        const NAMESPACE = "saverseats_match102"; 
+        
+        const visitsUrl = `https://api.counterapi.dev/v1/${NAMESPACE}/visits/up`;
+        const getVisitsUrl = `https://api.counterapi.dev/v1/${NAMESPACE}/visits`;
+        
+        const clicksUrl = `https://api.counterapi.dev/v1/${NAMESPACE}/clicks/up`;
+        const getClicksUrl = `https://api.counterapi.dev/v1/${NAMESPACE}/clicks`;
+
+        // Handle Visits
+        if (!sessionStorage.getItem("has_visited")) {
+            fetch(visitsUrl)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("visit-count").innerText = data.value.toLocaleString();
+                    sessionStorage.setItem("has_visited", "true");
+                })
+                .catch(() => fallbackVisits());
+        } else {
+            fallbackVisits();
+        }
+
+        function fallbackVisits() {
+            fetch(getVisitsUrl)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("visit-count").innerText = data.value.toLocaleString();
+                })
+                .catch(() => {
+                    document.getElementById("visit-count").innerText = "1";
+                });
+        }
+
+        // Handle Current Clicks
+        fetch(getClicksUrl)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("click-count").innerText = data.value.toLocaleString();
+            })
+            .catch(() => {
+                document.getElementById("click-count").innerText = "0";
+            });
+
+        // Event listener for click tracking
+        document.querySelectorAll('.track-click').forEach(element => {
+            element.addEventListener('click', function() {
+                fetch(clicksUrl)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("click-count").innerText = data.value.toLocaleString();
+                    })
+                    .catch(err => console.error("Error logging click:", err));
+            });
+        });
     </script>
 
 </body>
