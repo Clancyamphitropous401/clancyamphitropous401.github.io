@@ -3,49 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaverSeats | Live Event Portal</title>
+    <title>England vs Argentina Live | SaverSeats</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Get live updates and ticket access for England vs Argentina. The official SaverSeats live portal.">
+    <meta name="keywords" content="England vs Argentina, England vs Argentina tickets, World Cup 2026, live football, SaverSeats">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0a0f1e; --accent: #00dfd8; --card: rgba(13, 20, 35, 0.75); }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; }
-        .timer { font-size: 2rem; font-weight: 800; color: var(--accent); margin: 20px 0; }
-        .cta { background: var(--accent); color: #000; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-block; }
+        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: rgba(13, 20, 35, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; }
+        .timer { font-size: 1.8rem; font-weight: 800; color: #00dfd8; margin: 20px 0; }
+        .cta { background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; display: block; margin-top: 20px; }
+        .stats { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .stat-box { font-size: 0.9rem; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>SaverSeats</h1>
-        <p>Managed by [Your Name]</p>
+        <h1>England vs Argentina</h1>
         <div class="timer" id="countdown">Loading...</div>
         <a href="#" id="ticket-link" class="cta">Get Tickets</a>
+        
+        <div class="stats">
+            <div class="stat-box">Visitors<br><b id="visit-count">...</b></div>
+            <div class="stat-box">Clicks<br><b id="click-count">...</b></div>
+        </div>
     </div>
 
     <script>
-        // 3 PM Eastern = 15:00:00 ET
-        const targetDate = new Date("July 20, 2026 15:00:00 GMT-0400").getTime();
-
-        function updateTimer() {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
+        // 1. Countdown to July 20, 3 PM Eastern
+        const target = new Date("July 20, 2026 15:00:00 GMT-0400").getTime();
+        setInterval(() => {
+            const diff = target - new Date().getTime();
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m ${s}s`;
-        }
-        
-        // Automated SEO Ping
-        async function autoPing() {
-            const url = window.location.href;
-            const key = "YOUR_API_KEY"; // Replace with your actual key
-            try {
-                await fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(url)}&key=${key}`, {method: 'POST'});
-            } catch (e) { console.log("Ping skipped"); }
-        }
+            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m to Kick-off`;
+        }, 1000);
 
-        setInterval(updateTimer, 1000);
-        setInterval(autoPing, 30000); // Pings every 30 seconds
-        autoPing();
+        // 2. Live Stats
+        const NS = "saverseats_main";
+        function updateStats() {
+            fetch(`https://api.counterapi.dev/v1/${NS}/visits`).then(r=>r.json()).then(d=>document.getElementById("visit-count").innerText=d.value);
+            fetch(`https://api.counterapi.dev/v1/${NS}/clicks`).then(r=>r.json()).then(d=>document.getElementById("click-count").innerText=d.value);
+            // IndexNow Ping (Auto-notifies Bing/DuckDuckGo)
+            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_KEY_HERE`, {method: 'POST'});
+        }
+        setInterval(updateStats, 30000);
+        updateStats();
+        
+        document.querySelector('.cta').addEventListener('click', () => {
+            fetch(`https://api.counterapi.dev/v1/${NS}/clicks/up`);
+        });
     </script>
 </body>
 </html>
