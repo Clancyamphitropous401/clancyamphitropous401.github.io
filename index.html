@@ -1,27 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="google-site-verification" content="agVtCBJmhcAYPzgU3VaOrak951aSnqv714rLROn8fiQ" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="agVtCBJmhcAYPzgU3VaOrak951aSnqv714rLROn8fiQ" />
     <title>World Cup Live Updates - Match 102</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
         h1 { color: #0070f3; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
-        .live-badge { background: #ff0000; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
-        .gist-container { margin-top: 30px; border: 1px solid #ddd; border-radius: 6px; padding: 15px; background: #fafafa; }
+        .live-badge { display: inline-block; background: #ff0000; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; }
+        .feed-container { margin-top: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 25px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .data-row { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
+        .data-row:last-child { border: none; }
+        .label { font-weight: bold; color: #555; text-transform: uppercase; font-size: 0.85rem; }
+        .value { font-size: 1.1rem; margin-top: 3px; }
+        .btn-link { display: inline-block; background: #0070f3; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-top: 5px; }
+        .btn-link:hover { background: #0056b3; }
     </style>
 </head>
 <body>
 
-    <h1><span class="live-badge">Live</span> Match 102: England vs Argentina</h1>
-    <p>Welcome to our live event tracking feed. Below you will find the raw real-time data updates, schedule parameters, and match statistics pulled directly from our official Gist data feed.</p>
+    <span class="live-badge">Live Updates</span>
+    <h1>Match 102: England vs Argentina</h1>
+    <p>Get instant real-time tracking data and live seat availability updates below.</p>
 
-    <!-- This embeds your Gist cleanly so human visitors see a nice code block instead of a raw scary URL -->
-    <div class="gist-container">
-        <h3>Live JSON Feed Data</h3>
-        <script src="https://gist.github.com/saverseats/7ada68a374797e8b479ce578956f35ed.js"></script>
+    <div class="feed-container">
+        <!-- The live data will automatically populate here as real text and clickable links -->
+        <div id="live-feed">Loading match data...</div>
     </div>
+
+    <script>
+        // Directly fetching your raw Gist data file
+        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
+
+        fetch(gistUrl)
+            .then(response => response.json())
+            .then(data => {
+                const feedDiv = document.getElementById('live-feed');
+                
+                // Constructing clean, readable HTML with live clickable buttons
+                feedDiv.innerHTML = `
+                    <div class="data-row">
+                        <div class="label">Event Status</div>
+                        <div class="value" style="color: #00b0ff; font-weight: bold;">${data.event_status || "Live"}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="label">Current Matchup</div>
+                        <div class="value"><strong>${data.home_team || "England"}</strong> vs <strong>${data.away_team || "Argentina"}</strong></div>
+                    </div>
+                    <div class="data-row">
+                        <div class="label">Ticket Offers & Live Streams</div>
+                        <div class="value">
+                            <p>Get verified secondary market tickets and raw event broadcasts:</p>
+                            <a href="${data.affiliate_link || data.redirect_url || data.url || "#"}" class="btn-link" target="_blank">
+                                View Live Match Tracker & Tickets ➔
+                            </a>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(err => {
+                document.getElementById('live-feed').innerHTML = '<p style="color: red;">Unable to load live data feed. Please try refreshing.</p>';
+                console.error(err);
+            });
+    </script>
 
 </body>
 </html>
