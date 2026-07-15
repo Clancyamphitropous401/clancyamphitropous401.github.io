@@ -21,9 +21,13 @@
         :root { --card-bg: rgba(13, 20, 35, 0.75); --border-color: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
         .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; width: 95%; max-width: 500px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .live-score-container { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; height: 250px; }
+        
+        .live-score-container { margin: 20px 0; padding: 30px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: #050a15; }
         .timer { font-size: 1.5rem; font-weight: 800; color: #00dfd8; margin: 10px 0; }
-        .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 16px; border-radius: 50px; font-weight: 700; margin: 20px 0; }
+        
+        .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 16px; border-radius: 50px; font-weight: 700; margin: 20px 0; transition: 0.3s; }
+        .cta-btn:hover { transform: scale(1.05); }
+        
         .info-panel { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
         .stat-item { display: flex; flex-direction: column; }
         .label { font-size: 0.65rem; color: rgba(255,255,255,0.5); text-transform: uppercase; }
@@ -37,7 +41,8 @@
         <div class="timer" id="countdown">Calculating...</div>
         
         <div class="live-score-container">
-            <iframe src="https://www.sofascore.com/event/11352345/embed" width="100%" height="250" frameborder="0"></iframe>
+            <p style="margin-bottom: 15px; opacity: 0.8;">England vs Argentina Live Scoreboard</p>
+            <a href="https://www.sofascore.com/event/11352345" target="_blank" class="cta-btn">View Live Scoreboard ➔</a>
         </div>
         
         <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">View Tickets ➔</a>
@@ -74,10 +79,9 @@
         const getUrl = `https://api.counterapi.dev/v1/${NS}/`;
 
         function pingAll() {
-            // Stats Ping
             fetch(`${getUrl}visits`).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
             fetch(`${getUrl}clicks`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
-            // Search Engine IndexNow Ping
+            // Replace YOUR_HEX_KEY with your key from indexnow.org
             fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_HEX_KEY`, {method: 'POST'});
         }
         
