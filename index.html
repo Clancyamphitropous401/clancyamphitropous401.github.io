@@ -3,27 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaverSeats - Live Updates</title>
+    <title>SaverSeats - Live</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --card-bg: rgba(13, 20, 35, 0.75); --border-color: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.95)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed; background-size: cover; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; width: 90%; max-width: 600px; padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .cta-btn { display: inline-block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 16px 35px; border-radius: 50px; font-weight: 700; margin: 20px 0; transition: 0.3s; }
-        .cta-btn:hover { transform: scale(1.05); }
-        .info-panel { display: flex; justify-content: space-around; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .glass-card { background: rgba(13, 20, 35, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; width: 95%; max-width: 500px; padding: 25px; text-align: center; }
+        
+        /* Scoreboard Styling */
+        .live-score-container { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 15px; border-radius: 50px; font-weight: 700; margin: 20px 0; }
+        
+        .info-panel { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
         .stat-item { display: flex; flex-direction: column; }
-        .label { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-transform: uppercase; }
-        .value { font-size: 1.2rem; font-weight: 800; background: -webkit-linear-gradient(#00dfd8, #0070f3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .label { font-size: 0.65rem; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+        .value { font-size: 1.1rem; font-weight: 800; color: #00dfd8; }
     </style>
 </head>
 <body>
 
     <div class="glass-card">
-        <h1 id="match-title">Loading...</h1>
-        <p id="match-venue" style="color: rgba(255,255,255,0.6);">Please wait...</p>
+        <h1 id="match-title" style="font-size: 1.5rem;">Live Match Updates</h1>
         
-        <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">Get Live Access ➔</a>
+        <!-- Live Scoreboard Widget -->
+        <div class="live-score-container">
+            <iframe src="https://www.sofascore.com/event/11352345/embed" width="100%" height="200" frameborder="0"></iframe>
+        </div>
+        
+        <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">Get Tickets ➔</a>
 
         <div class="info-panel">
             <div class="stat-item">
@@ -38,18 +45,16 @@
     </div>
 
     <script>
-        // 1. GIST DATA PARSER
+        // 1. Data Parser
         const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
         fetch(gistUrl)
             .then(r => r.json())
             .then(d => {
                 const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
-                document.getElementById('match-title').innerText = find(d, 'name') || "England vs Argentina";
-                document.getElementById('match-venue').innerText = find(d, 'location')?.name || "Mercedes-Benz Stadium";
                 document.getElementById('ticket-action').href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
             });
 
-        // 2. STEALTH TRACKER
+        // 2. Stats Counter
         const NS = "saverseats_main";
         const vUrl = `https://api.counterapi.dev/v1/${NS}/visits`;
         const cUrl = `https://api.counterapi.dev/v1/${NS}/clicks`;
