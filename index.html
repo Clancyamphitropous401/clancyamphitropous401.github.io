@@ -2,22 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>England vs Argentina | SaverSeats Live</title>
-    <!-- SEO Metadata -->
-    <meta name="description" content="Official SaverSeats live portal for England vs Argentina World Cup 2026.">
-    <meta name="keywords" content="England vs Argentina, World Cup 2026, tickets, live updates">
-    
     <style>
-        body { margin: 0; font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: rgba(20, 20, 30, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; width: 100%; max-width: 800px; text-align: center; backdrop-filter: blur(10px); }
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; color: #fff;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+        header { display: flex; justify-content: space-between; padding: 20px 50px; align-items: center; background: rgba(0,0,0,0.3); }
+        .container { background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; width: 90%; max-width: 700px; margin: 50px auto; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
-        .box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .cta { display: block; background: #0070f3; color: white; padding: 20px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; }
-        .stats { display: flex; justify-content: space-around; margin-top: 30px; color: #888; font-size: 0.9rem; }
+        .box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .cta { display: block; background: #0070f3; color: white; padding: 20px; text-decoration: none; border-radius: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
+    <header>
+        <div style="font-weight: 800; font-size: 1.5rem;">SaverSeats</div>
+        <nav>Home &nbsp; Matches &nbsp; Tickets &nbsp; About</nav>
+    </header>
+
     <div class="container">
         <h1>MATCH 102: ENGLAND vs ARGENTINA</h1>
         <p>World Cup 2026 Semi-Final | Mercedes-Benz Stadium, Atlanta</p>
@@ -30,37 +36,25 @@
             <div class="box">TRAFFIC<br><span id="visit-count">...</span></div>
         </div>
         
-        <a href="https://argentinawc26.saverseats.com/" class="cta" onclick="trackClick()">VIEW LIVE TRACKER & GET TICKETS</a>
-        
-        <div class="stats">
-            <div>Visitors: <span id="visit-count-footer">...</span></div>
-            <div>Clicks: <span id="click-count">...</span></div>
-        </div>
+        <a href="https://argentinawc26.saverseats.com/" class="cta">VIEW LIVE TRACKER & GET TICKETS</a>
     </div>
 
     <script>
         const NS = "saverseats_main";
-        const getUrl = `https://api.counterapi.dev/v1/${NS}/`;
+        const INDEXNOW_KEY = "53fba66fb27b4b2594dafb10a83b1000
+"; // REPLACE THIS
 
         function pingAll() {
-            // Update Stats
-            fetch(`${getUrl}visits`).then(r => r.json()).then(d => {
-                document.getElementById('visit-count').innerText = d.value;
-                document.getElementById('visit-count-footer').innerText = d.value;
-            });
-            fetch(`${getUrl}clicks`).then(r => r.json()).then(d => {
-                document.getElementById('click-count').innerText = d.value;
-            });
+            // Update Live Stats
+            fetch(`https://api.counterapi.dev/v1/${NS}/visits`)
+                .then(r => r.json())
+                .then(d => { document.getElementById('visit-count').innerText = d.value; });
             
-            // SEO Ping (IndexNow) - REPLACE 'YOUR_KEY_HERE' WITH YOUR ACTUAL KEY
-            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_KEY_HERE`, {method: 'POST'});
+            // SEO Ping (IndexNow)
+            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=${INDEXNOW_KEY}`, { method: 'POST' });
         }
         
-        function trackClick() {
-            fetch(`${getUrl}clicks/up`);
-        }
-        
-        // Automated refresh every 30 seconds
+        // Auto-run every 30 seconds
         setInterval(pingAll, 30000);
         pingAll();
     </script>
