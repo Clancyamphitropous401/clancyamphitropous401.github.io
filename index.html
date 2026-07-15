@@ -11,7 +11,7 @@
       "@context": "https://schema.org",
       "@type": "SportsEvent",
       "name": "England vs Argentina - World Cup 2026",
-      "startDate": "2026-07-20T20:00:00Z",
+      "startDate": "2026-07-20T15:00:00-04:00",
       "location": { "@type": "Place", "name": "Mercedes-Benz Stadium" }
     }
     </script>
@@ -19,15 +19,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --card-bg: rgba(13, 20, 35, 0.75); --border-color: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.95)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed; background-size: cover; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
         .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; width: 95%; max-width: 500px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        
-        /* Scoreboard */
         .live-score-container { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; height: 250px; }
-        
-        /* Countdown */
         .timer { font-size: 1.5rem; font-weight: 800; color: #00dfd8; margin: 10px 0; }
-        
         .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 16px; border-radius: 50px; font-weight: 700; margin: 20px 0; }
         .info-panel { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
         .stat-item { display: flex; flex-direction: column; }
@@ -41,7 +36,6 @@
         <h1 style="font-size: 1.5rem; margin-bottom: 5px;">SaverSeats Live</h1>
         <div class="timer" id="countdown">Calculating...</div>
         
-        <!-- Live Scoreboard -->
         <div class="live-score-container">
             <iframe src="https://www.sofascore.com/event/11352345/embed" width="100%" height="250" frameborder="0"></iframe>
         </div>
@@ -55,30 +49,43 @@
     </div>
 
     <script>
-        // 1. Countdown Timer
-        const gameDate = new Date("2026-07-20T20:00:00Z").getTime();
-        setInterval(() => {
+        // 1. Precise Countdown
+        const gameDate = new Date("2026-07-20T15:00:00-04:00").getTime();
+        function updateTimer() {
             const diff = gameDate - new Date().getTime();
+            if (diff <= 0) { document.getElementById("countdown").innerText = "Match Live!"; return; }
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            document.getElementById("countdown").innerText = `${d}d ${h}h to Kick-off`;
-        }, 1000);
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m to Kick-off`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
 
         // 2. Data Parser
         const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
-        fetch(gistUrl)
-            .then(r => r.json())
-            .then(d => {
-                const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
-                document.getElementById('ticket-action').href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
-            });
+        fetch(gistUrl).then(r => r.json()).then(d => {
+            const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
+            document.getElementById('ticket-action').href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
+        });
 
-        // 3. Stats Counter
+        // 3. Stats & IndexNow Auto-Ping
         const NS = "saverseats_main";
-        fetch(`https://api.counterapi.dev/v1/${NS}/visits/up`).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
-        fetch(`https://api.counterapi.dev/v1/${NS}/clicks`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+        const getUrl = `https://api.counterapi.dev/v1/${NS}/`;
+
+        function pingAll() {
+            // Stats Ping
+            fetch(`${getUrl}visits`).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
+            fetch(`${getUrl}clicks`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+            // Search Engine IndexNow Ping
+            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_HEX_KEY`, {method: 'POST'});
+        }
+        
+        pingAll();
+        setInterval(pingAll, 30000); 
+
         document.querySelector('.track-click').addEventListener('click', () => {
-            fetch(`https://api.counterapi.dev/v1/${NS}/clicks/up`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+            fetch(`${getUrl}clicks/up`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
         });
     </script>
 </body>
