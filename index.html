@@ -3,96 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaverSeats - Live World Cup Updates</title>
-    
-    <!-- Google Event Schema -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SportsEvent",
-      "name": "England vs Argentina - World Cup 2026",
-      "startDate": "2026-07-20T15:00:00-04:00",
-      "location": { "@type": "Place", "name": "Mercedes-Benz Stadium" }
-    }
-    </script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>SaverSeats | Live Event Portal</title>
     <style>
-        :root { --card-bg: rgba(13, 20, 35, 0.75); --border-color: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; width: 95%; max-width: 500px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        
-        /* New Scoreboard Wrapper */
-        .live-score-wrapper { margin: 20px 0; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; overflow: hidden; }
-        
-        .timer { font-size: 1.5rem; font-weight: 800; color: #00dfd8; margin: 10px 0; }
-        .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 16px; border-radius: 50px; font-weight: 700; margin: 20px 0; transition: 0.3s; }
-        .cta-btn:hover { transform: scale(1.05); }
-        
-        .info-panel { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .stat-item { display: flex; flex-direction: column; }
-        .label { font-size: 0.65rem; color: rgba(255,255,255,0.5); text-transform: uppercase; }
-        .value { font-size: 1.1rem; font-weight: 800; color: #00dfd8; }
+        :root { --bg: #0a0f1e; --accent: #00dfd8; --card: rgba(13, 20, 35, 0.75); }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; }
+        .timer { font-size: 2rem; font-weight: 800; color: var(--accent); margin: 20px 0; }
+        .cta { background: var(--accent); color: #000; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-block; }
     </style>
 </head>
 <body>
-
-    <div class="glass-card">
-        <h1 style="font-size: 1.5rem; margin-bottom: 5px;">SaverSeats Live</h1>
-        <div class="timer" id="countdown">Calculating...</div>
-        
-        <!-- Updated Scoreboard: Using a Flashscore-style direct link container -->
-        <div class="live-score-wrapper">
-            <iframe src="https://www.flashscore.com/match/KjKjKjKj/#/match-summary" width="100%" height="300" frameborder="0"></iframe>
-        </div>
-        
-        <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">View Tickets ➔</a>
-
-        <div class="info-panel">
-            <div class="stat-item"><span class="label">Visitors</span><span id="visit-count" class="value">...</span></div>
-            <div class="stat-item"><span class="label">Clicks</span><span id="click-count" class="value">...</span></div>
-        </div>
+    <div class="card">
+        <h1>SaverSeats</h1>
+        <p>Managed by [Your Name]</p>
+        <div class="timer" id="countdown">Loading...</div>
+        <a href="#" id="ticket-link" class="cta">Get Tickets</a>
     </div>
 
     <script>
-        // 1. Precise Countdown
-        const gameDate = new Date("2026-07-20T15:00:00-04:00").getTime();
+        // 3 PM Eastern = 15:00:00 ET
+        const targetDate = new Date("July 20, 2026 15:00:00 GMT-0400").getTime();
+
         function updateTimer() {
             const now = new Date().getTime();
-            const diff = gameDate - now;
-            if (diff <= 0) { document.getElementById("countdown").innerText = "Match Live!"; return; }
+            const diff = targetDate - now;
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m to Kick-off`;
-        }
-        setInterval(updateTimer, 1000);
-        updateTimer();
-
-        // 2. Data Parser
-        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
-        fetch(gistUrl).then(r => r.json()).then(d => {
-            const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
-            document.getElementById('ticket-action').href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
-        });
-
-        // 3. Stats & IndexNow Auto-Ping
-        const NS = "saverseats_main";
-        const getUrl = `https://api.counterapi.dev/v1/${NS}/`;
-
-        function pingAll() {
-            fetch(`${getUrl}visits`).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
-            fetch(`${getUrl}clicks`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
-            // Replace YOUR_HEX_KEY with your key from indexnow.org
-            fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_HEX_KEY`, {method: 'POST'});
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m ${s}s`;
         }
         
-        pingAll();
-        setInterval(pingAll, 30000); 
+        // Automated SEO Ping
+        async function autoPing() {
+            const url = window.location.href;
+            const key = "YOUR_API_KEY"; // Replace with your actual key
+            try {
+                await fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(url)}&key=${key}`, {method: 'POST'});
+            } catch (e) { console.log("Ping skipped"); }
+        }
 
-        document.querySelector('.track-click').addEventListener('click', () => {
-            fetch(`${getUrl}clicks/up`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
-        });
+        setInterval(updateTimer, 1000);
+        setInterval(autoPing, 30000); // Pings every 30 seconds
+        autoPing();
     </script>
 </body>
 </html>
