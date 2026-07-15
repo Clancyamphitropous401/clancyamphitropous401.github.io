@@ -201,6 +201,7 @@
             transition: all 0.3s ease;
             width: 100%;
             max-width: 400px;
+            cursor: pointer;
         }
 
         .cta-btn:hover {
@@ -209,7 +210,7 @@
             filter: brightness(1.1);
         }
 
-        /* --- FOOTER BRAGGING --- */
+        /* --- FOOTER --- */
         footer {
             text-align: center;
             padding: 30px;
@@ -282,36 +283,84 @@
     </footer>
 
     <script>
-        // Use your clean, uncommitted Gist URL structure
-        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/world-cup-match-102-england-vs-argentina-live.json';
+        // Your exact raw Gist URL
+        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
 
         fetch(gistUrl)
             .then(response => response.json())
             .then(data => {
-                const event = data["@graph"] && data["@graph"][0] ? data["@graph"][0] : {};
-                const offers = data["@graph"] && data["@graph"][1] ? data["@graph"][1] : {};
+                let targetLink = "https://argentinawc26.saverseats.com/";
+                let matchName = "England vs Argentina (Semifinal) – FIFA World Cup 2026";
+                let venueName = "Mercedes-Benz Stadium, Atlanta";
+                let matchTime = "- : -";
+
+                // Safe extraction helper function to recursively search for keys
+                function findValueByKey(obj, keyToFind) {
+                    if (!obj || typeof obj !== 'object') return null;
+                    if (obj[keyToFind]) return obj[keyToFind];
+                    
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            let result = findValueByKey(obj[key], keyToFind);
+                            if (result) return result;
+                        }
+                    }
+                    return null;
+                }
+
+                // 1. Dig out the Link: Look for "url", then fallback to "@id" anywhere in the JSON
+                let foundUrl = findValueByKey(data, 'url');
+                let foundId = findValueByKey(data, '@id');
                 
-                // Map Gist JSON parameters directly to custom visual layouts
-                const matchName = event.name || "England vs Argentina (Semifinal) – FIFA World Cup 2026";
-                const venueName = event.location ? event.location.name : "Mercedes-Benz Stadium";
-                const targetLink = offers.url || event.url || "#";
-                
-                // Dynamically populate fields
+                if (foundUrl && foundUrl !== "#") {
+                    targetLink = foundUrl;
+                } else if (foundId && foundId.startsWith('http')) {
+                    targetLink = foundId.split('#')[0]; // Clean off any anchor tags like #event
+                }
+
+                // 2. Dig out the Event Name
+                let foundName = findValueByKey(data, 'name');
+                if (foundName) {
+                    matchName = foundName;
+                }
+
+                // 3. Dig out the Location / Venue
+                let locationObj = findValueByKey(data, 'location');
+                if (locationObj && locationObj.name) {
+                    venueName = locationObj.name;
+                } else {
+                    let foundVenue = findValueByKey(data, 'addressLocality');
+                    if (foundVenue) {
+                        venueName = `Mercedes-Benz Stadium, ${foundVenue}`;
+                    }
+                }
+
+                // 4. Dig out and format the Start Date
+                let foundDate = findValueByKey(data, 'startDate');
+                if (foundDate) {
+                    try {
+                        matchTime = new Date(foundDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    } catch(e) {
+                        console.log("Could not parse date format.");
+                    }
+                }
+
+                // Update page elements dynamically
                 document.getElementById('match-title').innerText = matchName;
                 document.getElementById('match-venue').innerText = venueName;
-                document.getElementById('ticket-action').href = targetLink;
-
-                // Handle match time nicely if available in JSON
-                if (event.startDate) {
-                    const time = new Date(event.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    document.getElementById('time-val').innerText = time;
-                }
+                document.getElementById('time-val').innerText = matchTime;
+                
+                // Assign the final verified URL to the button
+                const btn = document.getElementById('ticket-action');
+                btn.href = targetLink;
+                
+                console.log("Successfully loaded target: ", targetLink);
             })
             .catch(err => {
-                document.getElementById('match-title').innerText = "Live Stream & Data Active";
+                console.error("Gist Load Failed. Falling back to default settings: ", err);
+                document.getElementById('match-title').innerText = "England vs Argentina (Semifinal) – FIFA World Cup 2026";
                 document.getElementById('match-venue').innerText = "Mercedes-Benz Stadium, Atlanta";
                 document.getElementById('ticket-action').href = "https://argentinawc26.saverseats.com/";
-                console.error("Gist Load Failed - Using Direct URL Backup:", err);
             });
     </script>
 
