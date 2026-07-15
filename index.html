@@ -4,18 +4,33 @@
     <meta charset="UTF-8">
     <title>SaverSeats Live</title>
     <style>
+        /* Force the background to fill the screen and take priority */
         body { 
-            margin: 0; font-family: 'Inter', sans-serif; color: #fff; height: 100vh;
-            /* Direct link to stadium background */
+            margin: 0; 
+            font-family: 'Inter', sans-serif; 
+            color: #fff; 
+            height: 100vh;
+            width: 100vw;
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                        url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000') no-repeat center center fixed;
-            background-size: cover; display: flex; justify-content: center; align-items: center; 
+                        url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
         }
+        
         .main-card { 
-            background: rgba(20, 25, 35, 0.7); backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; 
-            padding: 40px; width: 800px; text-align: center; 
+            background: rgba(20, 25, 35, 0.7); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; 
+            padding: 40px; 
+            width: 800px; 
+            text-align: center; 
         }
+        
         .data-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
         .data-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
         .data-val { display: block; font-size: 1.2rem; font-weight: bold; color: #fff; margin-top: 5px; }
@@ -36,15 +51,14 @@
 <script>
     async function updateData() {
         try {
-            // Use your exact raw Gist URL
             const response = await fetch('https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json');
             const data = await response.json();
             
-            // Fix: Check if data exists before setting text
-            document.getElementById('score').innerText = data.score !== undefined ? data.score : "0 - 0";
-            document.getElementById('mins').innerText = data.minutes !== undefined ? data.minutes : "0";
-            document.getElementById('stat-val').innerText = data.status !== undefined ? data.status : "0";
-            document.getElementById('live-stat').innerText = data.live_status !== undefined ? data.live_status : "Live Scheduled";
+            // Only update if data exists, otherwise keep current text or default
+            document.getElementById('score').innerText = data.score || "0 - 0";
+            document.getElementById('mins').innerText = data.minutes || "0";
+            document.getElementById('stat-val').innerText = data.status || "0";
+            document.getElementById('live-stat').innerText = data.live_status || "Live Scheduled";
         } catch (e) {
             console.error("Fetch error:", e);
         }
