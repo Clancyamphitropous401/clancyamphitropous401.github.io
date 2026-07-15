@@ -4,70 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="agVtCBJmhcAYPzgU3VaOrak951aSnqv714rLROn8fiQ" />
-    <title>World Cup Live Updates - Match 102</title>
+    <title>SaverSeats - Live World Cup Updates</title>
+    <!-- Google Fonts for sleek typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
-        h1 { color: #0070f3; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
-        .live-badge { display: inline-block; background: #ff0000; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; }
-        .feed-container { margin-top: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 25px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .data-row { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
-        .data-row:last-child { border: none; }
-        .label { font-weight: bold; color: #555; text-transform: uppercase; font-size: 0.85rem; }
-        .value { font-size: 1.1rem; margin-top: 3px; }
-        .btn-link { display: inline-block; background: #0070f3; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-top: 5px; }
-        .btn-link:hover { background: #0056b3; }
+        :root {
+            --primary: #0070f3;
+            --primary-glow: rgba(0, 112, 243, 0.4);
+            --card-bg: rgba(13, 20, 35, 0.75);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.95)), 
+                        url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- STYLISH NAVIGATION HEADER --- */
+        header {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo span {
+            background: linear-gradient(45deg, #0070f3, #00dfd8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 25px;
+        }
+
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover, nav a.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* --- MAIN LAYOUT CONTAINER --- */
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* --- GLASSMORPHISM CENTRAL CARD --- */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 750px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        /* --- PULSATING LIVE BADGE --- */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ff3b30;
+            margin-bottom: 20px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff3b30;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(255, 59, 48, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        /* --- DATA STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* --- GLOWING ACTION BUTTON --- */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #0070f3, #00dfd8);
+            color: #fff;
+            text-decoration: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 30px var(--primary-glow);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 223, 216, 0.5);
+            filter: brightness(1.1);
+        }
+
+        /* --- FOOTER BRAGGING --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+            .glass-card { padding: 25px 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <span class="live-badge">Live Updates</span>
-    <h1>Match 102: England vs Argentina</h1>
-    <p>Get instant real-time tracking data and live seat availability updates below.</p>
+    <!-- Professional Premium Header -->
+    <header>
+        <a href="#" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00dfd8" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>SaverSeats</span>
+        </a>
+        <nav>
+            <a href="#" class="active">Matches</a>
+            <a href="#">Tickets</a>
+            <a href="#">Concerts</a>
+            <a href="#">About Us</a>
+        </nav>
+    </header>
 
-    <div class="feed-container">
-        <div id="live-feed">Loading match data...</div>
+    <div class="container">
+        <!-- Interactive Glass Card Container -->
+        <div class="glass-card">
+            
+            <div class="live-indicator">
+                <span class="live-dot"></span> Live updates
+            </div>
+
+            <h1 id="match-title">Loading Match Details...</h1>
+            <p class="subtitle" id="match-venue">Preparing live stadium data feed...</p>
+
+            <!-- Dynamic Stats Board -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Event Status</div>
+                    <div class="stat-value" id="status-val" style="color: #00dfd8;">Live Scheduled</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Starting Pitch</div>
+                    <div class="stat-value" id="time-val">- : -</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Availability</div>
+                    <div class="stat-value" id="seats-val">High Demand</div>
+                </div>
+            </div>
+
+            <!-- Premium Glowing Link -->
+            <a id="ticket-action" href="#" class="cta-btn" target="_blank">
+                View Live Match Tracker & Tickets ➔
+            </a>
+
+        </div>
     </div>
 
+    <footer>
+        &copy; 2026 SaverSeats. All live match schema and tracking indices updated in real-time.
+    </footer>
+
     <script>
-        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
+        // Use your clean, uncommitted Gist URL structure
+        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/world-cup-match-102-england-vs-argentina-live.json';
 
         fetch(gistUrl)
             .then(response => response.json())
             .then(data => {
-                const feedDiv = document.getElementById('live-feed');
-                
-                // Extracting the event details from your @graph array
                 const event = data["@graph"] && data["@graph"][0] ? data["@graph"][0] : {};
                 const offers = data["@graph"] && data["@graph"][1] ? data["@graph"][1] : {};
                 
-                // Fallback to primary URL if offers block is missing
-                const targetLink = offers.url || event.url || "https://argentinawc26.saverseats.com/";
+                // Map Gist JSON parameters directly to custom visual layouts
                 const matchName = event.name || "England vs Argentina (Semifinal) – FIFA World Cup 2026";
                 const venueName = event.location ? event.location.name : "Mercedes-Benz Stadium";
+                const targetLink = offers.url || event.url || "#";
+                
+                // Dynamically populate fields
+                document.getElementById('match-title').innerText = matchName;
+                document.getElementById('match-venue').innerText = venueName;
+                document.getElementById('ticket-action').href = targetLink;
 
-                feedDiv.innerHTML = `
-                    <div class="data-row">
-                        <div class="label">Event Status</div>
-                        <div class="value" style="color: #00b0ff; font-weight: bold;">Live Scheduled</div>
-                    </div>
-                    <div class="data-row">
-                        <div class="label">Current Matchup & Venue</div>
-                        <div class="value"><strong>${matchName}</strong> at <strong>${venueName}</strong></div>
-                    </div>
-                    <div class="data-row">
-                        <div class="label">Ticket Offers & Live Streams</div>
-                        <div class="value">
-                            <p>Get verified secondary market tickets and raw event broadcasts:</p>
-                            <a href="${targetLink}" class="btn-link" target="_blank">
-                                View Live Match Tracker & Tickets ➔
-                            </a>
-                        </div>
-                    </div>
-                `;
+                // Handle match time nicely if available in JSON
+                if (event.startDate) {
+                    const time = new Date(event.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    document.getElementById('time-val').innerText = time;
+                }
             })
             .catch(err => {
-                document.getElementById('live-feed').innerHTML = '<p style="color: red;">Unable to load live data feed. Please try refreshing.</p>';
-                console.error(err);
+                document.getElementById('match-title').innerText = "Live Stream & Data Active";
+                document.getElementById('match-venue').innerText = "Mercedes-Benz Stadium, Atlanta";
+                document.getElementById('ticket-action').href = "https://argentinawc26.saverseats.com/";
+                console.error("Gist Load Failed - Using Direct URL Backup:", err);
             });
     </script>
 
