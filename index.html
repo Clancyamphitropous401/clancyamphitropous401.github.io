@@ -211,51 +211,6 @@
             filter: brightness(1.1);
         }
 
-        /* --- STYLISH LIVE VISITOR COUNTER --- */
-        .stats-counter-container {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 15px;
-            max-width: 450px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .counter-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .counter-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .counter-value {
-            font-size: 1.25rem;
-            font-weight: 800;
-        }
-
-        #visit-count {
-            background: linear-gradient(45deg, #00dfd8, #0070f3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #click-count {
-            background: linear-gradient(45deg, #ff3b30, #ff9500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         /* --- FOOTER --- */
         footer {
             text-align: center;
@@ -270,7 +225,6 @@
             .stats-grid { grid-template-columns: 1fr; }
             h1 { font-size: 1.8rem; }
             .glass-card { padding: 30px 20px; }
-            .stats-counter-container { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
@@ -322,16 +276,16 @@
                 View Live Match Tracker & Tickets ➔
             </a>
 
-            <!-- Integrated Live Stats Dashboard -->
-            <div class="stats-counter-container">
-                <div class="counter-item">
-                    <span class="counter-label">Page Views</span>
-                    <span class="counter-value" id="visit-count">...</span>
+            <!-- Stealth Live Dashboard (Protected from Adblockers) -->
+            <div class="info-panel-box" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 15px; max-width: 450px; margin: 0 auto; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(5px);">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, 0.4);">Page Views</span>
+                    <span id="visit-count" style="font-size: 1.25rem; font-weight: 800; background: linear-gradient(45deg, #00dfd8, #0070f3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">...</span>
                 </div>
                 <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1);"></div>
-                <div class="counter-item">
-                    <span class="counter-label">Link Clicks</span>
-                    <span class="counter-value" id="click-count">...</span>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, 0.4);">Link Clicks</span>
+                    <span id="click-count" style="font-size: 1.25rem; font-weight: 800; background: linear-gradient(45deg, #ff3b30, #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">...</span>
                 </div>
             </div>
 
@@ -412,7 +366,7 @@
                 document.getElementById('ticket-action').href = "https://argentinawc26.saverseats.com/";
             });
 
-        // 2. LIVE TRAFFIC & CLICK COUNTER SCRIPT (Using a unique namespace for saverseats)
+        // 2. LIVE TRAFFIC & CLICK COUNTER SCRIPT
         const NAMESPACE = "saverseats_match102"; 
         
         const visitsUrl = `https://api.counterapi.dev/v1/${NAMESPACE}/visits/up`;
