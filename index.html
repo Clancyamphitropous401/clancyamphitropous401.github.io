@@ -3,72 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaverSeats - Live</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>SaverSeats - Live Event</title>
+    <!-- Google Event Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      "name": "England vs Argentina - World Cup 2026",
+      "startDate": "2026-07-20T20:00:00Z",
+      "location": {
+        "@type": "Place",
+        "name": "Mercedes-Benz Stadium"
+      }
+    }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .glass-card { background: rgba(13, 20, 35, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; width: 95%; max-width: 500px; padding: 25px; text-align: center; }
-        
-        /* Scoreboard Styling */
-        .live-score-container { margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        .cta-btn { display: block; background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; text-decoration: none; padding: 15px; border-radius: 50px; font-weight: 700; margin: 20px 0; }
-        
-        .info-panel { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .stat-item { display: flex; flex-direction: column; }
-        .label { font-size: 0.65rem; color: rgba(255,255,255,0.5); text-transform: uppercase; }
-        .value { font-size: 1.1rem; font-weight: 800; color: #00dfd8; }
+        body { font-family: sans-serif; background: #0a0f1e; color: #fff; display: flex; justify-content: center; padding: 20px; }
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 30px; width: 100%; max-width: 500px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .timer { font-size: 2rem; font-weight: 800; color: #00dfd8; margin: 20px 0; }
+        .score-box { font-size: 1.5rem; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .cta-btn { display: block; background: #0070f3; color: white; padding: 15px; text-decoration: none; border-radius: 30px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
-        <h1 id="match-title" style="font-size: 1.5rem;">Live Match Updates</h1>
-        
-        <!-- Live Scoreboard Widget -->
-        <div class="live-score-container">
-            <iframe src="https://www.sofascore.com/event/11352345/embed" width="100%" height="200" frameborder="0"></iframe>
-        </div>
-        
-        <a id="ticket-action" href="#" class="cta-btn track-click" target="_blank">Get Tickets ➔</a>
-
-        <div class="info-panel">
-            <div class="stat-item">
-                <span class="label">Visitors</span>
-                <span id="visit-count" class="value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="label">Clicks</span>
-                <span id="click-count" class="value">0</span>
-            </div>
-        </div>
+<div class="glass-card">
+    <h2 id="event-name">England vs Argentina</h2>
+    
+    <!-- Scoreboard -->
+    <div class="score-box" id="scoreboard">
+        Live Score: 0 - 0
     </div>
 
-    <script>
-        // 1. Data Parser
-        const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
-        fetch(gistUrl)
-            .then(r => r.json())
-            .then(d => {
-                const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
-                document.getElementById('ticket-action').href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
-            });
+    <!-- Countdown Timer -->
+    <div class="label">Kick-off in:</div>
+    <div class="timer" id="countdown">Loading...</div>
 
-        // 2. Stats Counter
-        const NS = "saverseats_main";
-        const vUrl = `https://api.counterapi.dev/v1/${NS}/visits`;
-        const cUrl = `https://api.counterapi.dev/v1/${NS}/clicks`;
+    <a href="#" id="ticket-link" class="cta-btn track-click">Get Tickets</a>
 
-        if (!sessionStorage.getItem("hit")) {
-            fetch(`${vUrl}/up`).then(() => sessionStorage.setItem("hit", "1"));
-        }
-        
-        fetch(vUrl).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
-        fetch(cUrl).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+    <!-- Counter -->
+    <div style="margin-top: 20px; font-size: 0.8rem; color: #666;">
+        Views: <span id="visit-count">...</span> | Clicks: <span id="click-count">...</span>
+    </div>
+</div>
 
-        document.querySelector('.track-click').addEventListener('click', () => {
-            fetch(`${cUrl}/up`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
-        });
-    </script>
+<script>
+    // 1. Countdown Logic
+    const gameDate = new Date("2026-07-20T20:00:00Z").getTime();
+    setInterval(() => {
+        const now = new Date().getTime();
+        const diff = gameDate - now;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById("countdown").innerText = `${d}d ${h}h to go`;
+    }, 1000);
+
+    // 2. Gist Data & Ticket Link
+    const gistUrl = 'https://gist.githubusercontent.com/saverseats/7ada68a374797e8b479ce578956f35ed/raw/b6389921cd2f9192835dfd3d1e3e61e26214867f/world-cup-match-102-england-vs-argentina-live.json';
+    fetch(gistUrl).then(r=>r.json()).then(d => {
+        const find = (o, k) => o[k] || Object.values(o).reduce((acc, v) => acc || (typeof v === 'object' ? find(v, k) : null), null);
+        document.getElementById("ticket-link").href = find(d, 'url') || "https://argentinawc26.saverseats.com/";
+    });
+
+    // 3. Counter Logic
+    const NS = "saverseats_main";
+    fetch(`https://api.counterapi.dev/v1/${NS}/visits/up`).then(r => r.json()).then(d => document.getElementById("visit-count").innerText = d.value);
+    fetch(`https://api.counterapi.dev/v1/${NS}/clicks`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+    document.querySelector('.track-click').addEventListener('click', () => {
+        fetch(`https://api.counterapi.dev/v1/${NS}/clicks/up`).then(r => r.json()).then(d => document.getElementById("click-count").innerText = d.value);
+    });
+</script>
 </body>
 </html>
