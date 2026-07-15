@@ -3,58 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>England vs Argentina Live | SaverSeats</title>
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Get live updates and ticket access for England vs Argentina. The official SaverSeats live portal.">
-    <meta name="keywords" content="England vs Argentina, England vs Argentina tickets, World Cup 2026, live football, SaverSeats">
+    <title>England vs Argentina | SaverSeats Live</title>
+    <!-- SEO Metadata -->
+    <meta name="description" content="Official SaverSeats live portal for England vs Argentina World Cup 2026.">
+    <meta name="keywords" content="England vs Argentina, World Cup 2026, tickets, live updates">
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0f1e; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: rgba(13, 20, 35, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; }
-        .timer { font-size: 1.8rem; font-weight: 800; color: #00dfd8; margin: 20px 0; }
-        .cta { background: linear-gradient(135deg, #0070f3, #00dfd8); color: #fff; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; display: block; margin-top: 20px; }
-        .stats { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .stat-box { font-size: 0.9rem; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: rgba(20, 20, 30, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; width: 100%; max-width: 800px; text-align: center; backdrop-filter: blur(10px); }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 30px 0; }
+        .box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .cta { display: block; background: #0070f3; color: white; padding: 20px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; }
+        .stats { display: flex; justify-content: space-around; margin-top: 30px; color: #888; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>England vs Argentina</h1>
-        <div class="timer" id="countdown">Loading...</div>
-        <a href="#" id="ticket-link" class="cta">Get Tickets</a>
+    <div class="container">
+        <h1>MATCH 102: ENGLAND vs ARGENTINA</h1>
+        <p>World Cup 2026 Semi-Final | Mercedes-Benz Stadium, Atlanta</p>
+        
+        <div class="grid">
+            <div class="box">SCORE<br>0 - 0</div>
+            <div class="box">MINUTES<br>0</div>
+            <div class="box">STATUS<br>Live</div>
+            <div class="box">TICKETS<br>Active</div>
+            <div class="box">TRAFFIC<br><span id="visit-count">...</span></div>
+        </div>
+        
+        <a href="https://argentinawc26.saverseats.com/" class="cta" onclick="trackClick()">VIEW LIVE TRACKER & GET TICKETS</a>
         
         <div class="stats">
-            <div class="stat-box">Visitors<br><b id="visit-count">...</b></div>
-            <div class="stat-box">Clicks<br><b id="click-count">...</b></div>
+            <div>Visitors: <span id="visit-count-footer">...</span></div>
+            <div>Clicks: <span id="click-count">...</span></div>
         </div>
     </div>
 
     <script>
-        // 1. Countdown to July 20, 3 PM Eastern
-        const target = new Date("July 20, 2026 15:00:00 GMT-0400").getTime();
-        setInterval(() => {
-            const diff = target - new Date().getTime();
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById("countdown").innerText = `${d}d ${h}h ${m}m to Kick-off`;
-        }, 1000);
-
-        // 2. Live Stats
         const NS = "saverseats_main";
-        function updateStats() {
-            fetch(`https://api.counterapi.dev/v1/${NS}/visits`).then(r=>r.json()).then(d=>document.getElementById("visit-count").innerText=d.value);
-            fetch(`https://api.counterapi.dev/v1/${NS}/clicks`).then(r=>r.json()).then(d=>document.getElementById("click-count").innerText=d.value);
-            // IndexNow Ping (Auto-notifies Bing/DuckDuckGo)
+        const getUrl = `https://api.counterapi.dev/v1/${NS}/`;
+
+        function pingAll() {
+            // Update Stats
+            fetch(`${getUrl}visits`).then(r => r.json()).then(d => {
+                document.getElementById('visit-count').innerText = d.value;
+                document.getElementById('visit-count-footer').innerText = d.value;
+            });
+            fetch(`${getUrl}clicks`).then(r => r.json()).then(d => {
+                document.getElementById('click-count').innerText = d.value;
+            });
+            
+            // SEO Ping (IndexNow) - REPLACE 'YOUR_KEY_HERE' WITH YOUR ACTUAL KEY
             fetch(`https://api.indexnow.org/indexnow?url=${encodeURIComponent(window.location.href)}&key=YOUR_KEY_HERE`, {method: 'POST'});
         }
-        setInterval(updateStats, 30000);
-        updateStats();
         
-        document.querySelector('.cta').addEventListener('click', () => {
-            fetch(`https://api.counterapi.dev/v1/${NS}/clicks/up`);
-        });
+        function trackClick() {
+            fetch(`${getUrl}clicks/up`);
+        }
+        
+        // Automated refresh every 30 seconds
+        setInterval(pingAll, 30000);
+        pingAll();
     </script>
 </body>
 </html>
